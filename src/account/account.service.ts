@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { AccountRepository } from './account.repository';
 import { CreateEventDto, EventType } from './dto/create-event.dto';
 
@@ -17,9 +17,23 @@ export class AccountService {
   }
 
   executeEvent(dto: CreateEventDto) {
-    if (dto.type === EventType.DEPOSIT) {
-      return this.handleDeposit(dto.destination!, dto.amount);
+    switch (dto.type) {
+      case EventType.DEPOSIT:
+        return this.handleDeposit(dto.destination!, dto.amount);
+
+      case EventType.WITHDRAW:
+        return this.handleWithdraw(dto.origin!, dto.amount);
+
+      case EventType.TRANSFER:
+        return this.handleTransfer(dto.origin!, dto.destination!, dto.amount);
+
+      default:
+        throw new BadRequestException('Invalid event type');
     }
+  }
+
+  resetAll() {
+    this.repository.reset();
   }
 
   private handleDeposit(destinationId: string, amount: number) {
@@ -32,6 +46,51 @@ export class AccountService {
       destination: {
         id: destinationId,
         balance: newBalance,
+      },
+    };
+  }
+
+  private handleWithdraw(originId: string, amount: number) {
+    const currentBalance = this.repository.findBalance(originId);
+
+    if (currentBalance === undefined) {
+      throw new NotFoundException(0);
+    }
+
+    const newBalance = currentBalance - amount;
+
+    this.repository.save(originId, newBalance);
+
+    return {
+      origin: {
+        id: originId,
+        balance: newBalance,
+      },
+    };
+  }
+
+  private handleTransfer(originId: string, destinationId: string, amount: number) {
+    const originBalance = this.repository.findBalance(originId);
+
+    if (originBalance === undefined) {
+      throw new NotFoundException(0);
+    }
+
+    const newOriginBalance = originBalance - amount;
+    this.repository.save(originId, newOriginBalance);
+
+    const destinationBalance = this.repository.findBalance(destinationId) ?? 0;
+    const newDestinationBalance = destinationBalance + amount;
+    this.repository.save(destinationId, newDestinationBalance);
+
+    return {
+      origin: {
+        id: originId,
+        balance: newOriginBalance,
+      },
+      destination: {
+        id: destinationId,
+        balance: newDestinationBalance,
       },
     };
   }

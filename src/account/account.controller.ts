@@ -20,4 +20,12 @@ export class AccountController {
   createEvent(@Body() dto: CreateEventDto) {
     return this.accountService.executeEvent(dto);
   }
+
+  @Post('reset')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Reset all accounts' })
+  reset() {
+    this.accountService.resetAll();
+    return 'OK';
+  }
 }

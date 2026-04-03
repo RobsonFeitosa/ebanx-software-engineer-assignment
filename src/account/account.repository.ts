@@ -11,4 +11,8 @@ export class AccountRepository {
   save(id: string, balance: number): void {
     this.accounts.set(id, balance);
   }
+
+  reset(): void {
+    this.accounts.clear();
+  }
 }
