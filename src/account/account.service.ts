@@ -57,6 +57,10 @@ export class AccountService {
       throw new NotFoundException(0);
     }
 
+    if (currentBalance < amount) {
+      throw new BadRequestException('Insufficient balance');
+    }
+
     const newBalance = currentBalance - amount;
 
     this.repository.save(originId, newBalance);
@@ -74,6 +78,10 @@ export class AccountService {
 
     if (originBalance === undefined) {
       throw new NotFoundException(0);
+    }
+
+    if (originBalance < amount) {
+      throw new BadRequestException('Insufficient balance');
     }
 
     const newOriginBalance = originBalance - amount;

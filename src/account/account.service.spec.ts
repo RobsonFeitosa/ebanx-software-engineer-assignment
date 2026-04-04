@@ -78,6 +78,15 @@ describe('AccountService', () => {
         })).toThrow(NotFoundException);
       });
 
+      it('should throw BadRequestException if balance is insufficient', () => {
+        repository.save('100', 10);
+        expect(() => service.executeEvent({
+          type: EventType.WITHDRAW,
+          origin: '100',
+          amount: 20
+        })).toThrow(BadRequestException);
+      });
+
       it('should subtract from the existing account balance', () => {
         repository.save('100', 20);
         const result = service.executeEvent({
@@ -101,6 +110,16 @@ describe('AccountService', () => {
           destination: '300',
           amount: 15
         })).toThrow(NotFoundException);
+      });
+
+      it('should throw BadRequestException if origin balance is insufficient', () => {
+        repository.save('100', 5);
+        expect(() => service.executeEvent({
+          type: EventType.TRANSFER,
+          origin: '100',
+          destination: '300',
+          amount: 10
+        })).toThrow(BadRequestException);
       });
 
       it('should transfer from origin to destination', () => {

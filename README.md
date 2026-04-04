@@ -35,15 +35,13 @@ Para atender ao requisito de **"Separação de Responsabilidades"**, a estrutura
 ```bash
 src/
 ├── account/
-│   ├── dto/                # Validação de entrada (CreateEventDto)
-│   ├── account.controller.ts # Endpoints (HTTP Layer)
-│   ├── account.service.ts    # Regras de Negócio (Business Layer)
-│   ├── account.repository.ts # Persistência em Memória (Data Layer)
-│   └── account.module.ts
-├── common/
-│   └── filters/            # Tratamento global de exceções
+│   ├── dto/                
+│   ├── account.controller.ts 
+│   ├── account.service.ts    
+│   ├── account.repository.ts 
+│   └── account.module.ts 
 ├── app.module.ts
-└── main.ts                 # Configuração de Swagger e Validation Pipes
+└── main.ts                 
 
 
 ## 🛠️ Tecnologias Principais
